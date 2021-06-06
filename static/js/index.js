@@ -109,6 +109,7 @@ ReceiverOption = {
 };
 
 Receiver.setOption(ReceiverOption);
+
 SenderOption = {
     tooltip: {
         trigger: 'axis',

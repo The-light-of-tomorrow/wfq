@@ -13,12 +13,15 @@ def post_dhcp(role):
 
 
 def post_log(flow_id, p_size, packet_num, now_time, time_type):
-    url = "http://{}/log".format(control_plane_ip)
+    url = "http://{}/log/host".format(control_plane_ip)
     # time_type 0代表发送时上报，1代表接收时上报
     data = {"flow_id": flow_id, "packet_size": p_size, "packet_number": packet_num, "now_time": now_time,
             "time_type": time_type}
-    res = requests.post(url=url, data=data)
-    return json.loads(res.text)
+    try:
+        res = requests.post(url=url, data=data)
+        return res.status_code
+    except requests.exceptions.ConnectionError as e:
+        return e
 
 
 def get_setting():
@@ -39,9 +42,12 @@ def hex2dec(s):
 
 def router_post(time_t, round_number_t, active_queue_number):
     data = {'time_t': time_t, 'round_number_t': round_number_t, 'active_queue_number': active_queue_number}
-    url = "http://{}/router".format(control_plane_ip)
-    res = requests.post(url=url, data=data)
-    return json.loads(res.text)
+    url = "http://{}/log/router".format(control_plane_ip)
+    try:
+        res = requests.post(url=url, data=data)
+        return res.status_code
+    except requests.exceptions.ConnectionError as e:
+        return e
 
 
 def ip_hex2dec(s):
