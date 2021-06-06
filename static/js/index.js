@@ -171,7 +171,7 @@ Sender.showLoading();
 setInterval(function () {
     $.get('/data/sender_demo', function (res) {
         Sender.hideLoading();
-        console.log("Sender: ",res);
+        console.log("Sender: ", res);
         Sender.setOption({
             xAxis: {
                 type: 'category',
@@ -282,3 +282,17 @@ setInterval(function () {
     });
 }, 1000)
 
+
+var updateSetting = function () {
+    var data = jqu.formData('form_setting');
+    console.log(data)
+    jqu.loadJson('/setting/set', data, function (result) {
+        if (result.code!=200) {
+            alert(result.code);
+            return;
+        }
+        alert('修改成功!');
+        $('#setting').modal('hide');
+
+    });
+};

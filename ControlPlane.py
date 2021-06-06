@@ -27,8 +27,8 @@ receiver_prefix = 24
 
 sender_data = {'1': [], '2': [], '3': []}
 # 这三个数据做成图
-receiver_data = {'1': [[1, 2], [2, 3]], '2': [[1, 2], [2, 3]], '3': [[1, 2], [2, 3]]}
-# receiver_data = {'1': [], '2': [], '3': []}
+# receiver_data = {'1': [[1, 2], [2, 3]], '2': [[1, 2], [2, 3]], '3': [[1, 2], [2, 3]]}
+receiver_data = {'1': [], '2': [], '3': []}
 sender_data_result = []
 router_data = []
 
@@ -116,7 +116,8 @@ def data_router_data():
 
 @app.route('/')
 def index():
-    return render_template("index.html")
+    print(user_setting.forwarding_algorithm)
+    return render_template("index.html", forwarding_algorithm=user_setting.forwarding_algorithm)
 
 
 @app.route('/dhcp', methods=['POST'])
@@ -141,13 +142,8 @@ def dhcp():
 
 @app.route('/setting/set', methods=['POST'])
 def setting_set():
-    # 写入设置
-    #
-    #
-    #
-    #
-    #
-    #
+    forward_algorithm = request.form.get('forward_algorithm')
+    user_setting.forwarding_algorithm = forward_algorithm
     result = {'code': 200}
     return json.dumps(result, ensure_ascii=False)
 
