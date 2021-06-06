@@ -1,7 +1,6 @@
 import binascii
 import requests
 import json
-import aiohttp
 
 control_plane_ip = '127.0.0.1'
 
