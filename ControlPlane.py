@@ -25,6 +25,17 @@ sender_prefix = 24
 receiver_prefix = 24
 
 
+class Setting:
+    def __init__(self):
+        self.forwarding_algorithm = 'WFQ'  # FIFO WFQ
+        self.RouteRate = '20Mbps'
+        self.Receiver = '172.16.2.1'
+        self.Sender = {'172.16.1.1': [1, 512], '172.16.1.2': [1, 1024], '172.16.1.3': [1, 1024]}
+
+
+user_setting = Setting()
+
+
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -70,6 +81,34 @@ def log():
     return json.dumps(result, ensure_ascii=False)
 
 
+@app.route('/setting/set', methods=['POST'])
+def setting_set():
+    # 写入设置
+    result = {'code': 200}
+    return json.dumps(result, ensure_ascii=False)
+
+
+@app.route('/setting/get', methods=['POST'])
+def setting_get():
+    # 读取设置
+    result = {'forwarding_algorithm': user_setting.forwarding_algorithm, 'Sender': user_setting.Sender}
+    return json.dumps(result, ensure_ascii=False)
+
+
+@app.route('/router', methods=['POST'])
+def router():
+    # 统计Router的t,R(t),Acitve Queue Number
+    time_t = request.form.get('time_t')
+    round_number_t = request.form.get('round_number_t')
+    active_queue_number = request.form.get('active_queue_number')
+    # 将这些数据存入数组，等待网页读取
+    msg = "Time: {}, Round Number: {}, Active Queue Number: {}.".format(time_t, round_number_t, active_queue_number)
+    logger.info(msg)
+    # print(time_t, round_number_t, active_queue_number)
+    result = {'code': 200}
+    return json.dumps(result, ensure_ascii=False)
+
+
 if __name__ == '__main__':
-    app.secret_key = '123456'
+    app.secret_key = '20020090082 Liu Ming'
     app.run(port=80, host='127.0.0.1', debug=True)

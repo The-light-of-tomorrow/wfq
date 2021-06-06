@@ -1,6 +1,7 @@
 import binascii
 import requests
 import json
+import aiohttp
 
 control_plane_ip = '127.0.0.1'
 
@@ -21,6 +22,13 @@ def post_log(flow_id, p_size, packet_num, now_time, time_type):
     return json.loads(res.text)
 
 
+def get_setting():
+    url = "http://{}/setting/get".format(control_plane_ip)
+    data = dict()
+    res = requests.post(url=url, data=data)
+    return json.loads(res.text)
+
+
 def hex_to_str(s):
     s = binascii.unhexlify(s)
     return s.decode('utf-8')
@@ -28,6 +36,13 @@ def hex_to_str(s):
 
 def hex2dec(s):
     return int(s, 16)
+
+
+def router_post(time_t, round_number_t, active_queue_number):
+    data = {'time_t': time_t, 'round_number_t': round_number_t, 'active_queue_number': active_queue_number}
+    url = "http://{}/router".format(control_plane_ip)
+    res = requests.post(url=url, data=data)
+    return json.loads(res.text)
 
 
 def ip_hex2dec(s):
