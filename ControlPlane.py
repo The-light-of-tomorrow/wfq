@@ -1,5 +1,7 @@
 import json
 import logging
+import time
+
 from flask import Flask, request, render_template
 import os
 
@@ -25,7 +27,8 @@ receiver_prefix = 24
 
 sender_data = {'1': [], '2': [], '3': []}
 # 这三个数据做成图
-receiver_data = {'1': [], '2': [], '3': []}
+receiver_data = {'1': [[1, 2], [2, 3]], '2': [[1, 2], [2, 3]], '3': [[1, 2], [2, 3]]}
+# receiver_data = {'1': [], '2': [], '3': []}
 sender_data_result = []
 router_data = []
 
@@ -48,22 +51,57 @@ def data_receiver_data():
     receiver_data_temp = receiver_data
     temp = {'1': [], '2': [], '3': []}
     sum1 = 0
-    for i in receiver_data_temp['1']:
+    # 最多取后五十个数据，采集简化
+    for i in receiver_data_temp['1'][-50:]:
         sum1 = int(i[1]) + sum1
         temp['1'].append([str(round(float(i[0]), 1)), str(sum1)])
     sum2 = 0
-    for i in receiver_data_temp['2']:
+    for i in receiver_data_temp['2'][-50:]:
         sum2 = int(i[1]) + sum2
         temp['2'].append([str(round(float(i[0]), 1)), str(sum2)])
     sum3 = 0
-    for i in receiver_data_temp['3']:
+    for i in receiver_data_temp['3'][-50:]:
         sum3 = int(i[1]) + sum3
         temp['3'].append([str(round(float(i[0]), 1)), str(sum3)])
-    return temp
+    time_line = []
+    flow_id_1 = []
+    flow_id_2 = []
+    flow_id_3 = []
+    for i in temp['1']:
+        time_line.append(i[0])
+        flow_id_1.append(i[1])
+    for i in temp['2']:
+        flow_id_2.append(i[1])
+    for i in temp['3']:
+        flow_id_3.append(i[1])
+    # 考虑把时间转换成人类可读
+    result = {'time_line': [], 'flow_id_1': flow_id_1, 'flow_id_2': flow_id_2, 'flow_id_3': flow_id_3}
+    return result
+
+
+@app.route('/data/sender_demo')
+def sender_demo():
+    return {
+        "time_line": ['0s', '2s', '4s', '6s', '8s', '10s', '12s'],
+        "flow_id_1": [0, 1, 4, 0, 230, 210],
+        "flow_id_2": [0, 2, 5, 0, 0, 330, 310],
+        "flow_id_3": [0, 3, 6, 154, 190, 330, 410]
+    }
+
+
+@app.route('/data/receiver_demo')
+def receiver_demo():
+    return {
+        "time_line": ['0s', '2s', '4s', '6s', '8s', '10s', '12s'],
+        "flow_id_1": [0, 101, 134, 0, 230, 210],
+        "flow_id_2": [0, 0, 191, 0, 0, 330, 310],
+        "flow_id_3": [0, 232, 201, 154, 190, 330, 410]
+    }
 
 
 @app.route('/data/sender_data_result')
 def data_sender_data_result():
+    # 返回最近50个延迟
     a = dict()
     a['Result'] = sender_data_result
     return a
