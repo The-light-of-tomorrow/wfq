@@ -169,7 +169,7 @@ Sender.setOption(SenderOption);
 Sender.showLoading();
 
 setInterval(function () {
-    $.get('/data/sender_demo', function (res) {
+    $.get('/data/sender_data_result', function (res) {
         Sender.hideLoading();
         console.log("Sender: ", res);
         Sender.setOption({

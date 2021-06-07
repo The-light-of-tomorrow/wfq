@@ -57,10 +57,32 @@ def sender_demo():
 
 @app.route('/data/sender_data_result')
 def data_sender_data_result():
-    # 返回最近50个延迟
-    a = dict()
-    a['Result'] = sender_data_result
-    return a
+    sender_data_temp = sender_data_result
+    temp = {'1': [], '2': [], '3': []}
+    for i in sender_data_temp:
+        temp_delay = str(float(int((float(i[0]) * 10000))) / 10)
+        temp_time = int2datetime(int(float(i[3]) * 1000))[14:-2]
+        if i[1] == '1':
+            temp['1'].append([temp_time, temp_delay])
+        elif i[1] == '2':
+            temp['2'].append([temp_time, temp_delay])
+        elif i[1] == '3':
+            temp['3'].append([temp_time, temp_delay])
+    time_line = []
+    flow_id_1 = []
+    flow_id_2 = []
+    flow_id_3 = []
+    for i in temp['1']:
+        time_line.append(i[0])
+        flow_id_1.append(i[1])
+    for i in temp['2']:
+        flow_id_2.append(i[1])
+    for i in temp['3']:
+        flow_id_3.append(i[1])
+    result = {'time_line': time_line, 'flow_id_1': flow_id_1,
+              'flow_id_2': ['0'] * (len(flow_id_1) - len(flow_id_2)) + flow_id_2,
+              'flow_id_3': ['0'] * (len(flow_id_1) - len(flow_id_3)) + flow_id_3}
+    return result
 
 
 # 返回时间、每个 Flow ID 接收的数据包总大小
@@ -73,7 +95,7 @@ sum3 = 0
 def data_receiver_data():
     global sum1, sum2, sum3
     # receiver_data = {'1': [时间，包大小], '2': [], '3': []}
-    # 需要把数据处理成 {'1': [时间四舍五入为0.1秒颗粒度，包大小累计], '2': [], '3': []}
+    # 需要把数据处理成 {'1': [时间四舍五入为1ms颗粒度，包大小累计], '2': [], '3': []}
     receiver_data_temp = receiver_data
     temp = {'1': [], '2': [], '3': []}
     # 最多取后五十个数据，采集简化
@@ -185,7 +207,7 @@ def log():
             if i[0] == _packet_number:
                 send_time = i[1]
                 break
-        temp = [float(_now_time) - float(send_time), _flow_id, _packet_size]
+        temp = [float(_now_time) - float(send_time), _flow_id, _packet_size, _now_time]
         sender_data_result.append(temp)
     elif data['time_type'] == '2':
         _now_time = data['now_time']
