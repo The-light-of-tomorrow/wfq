@@ -1,3 +1,39 @@
+function getClientHeight() {
+    var clientHeight = 0;
+    if (document.body.clientHeight && document.documentElement.clientHeight) {
+        var clientHeight = (document.body.clientHeight < document.documentElement.clientHeight) ? document.body.clientHeight : document.documentElement.clientHeight;
+    } else {
+        var clientHeight = (document.body.clientHeight > document.documentElement.clientHeight) ? document.body.clientHeight : document.documentElement.clientHeight;
+    }
+    return clientHeight;
+}
+
+var initPlane = function () {
+    var clientHeight = getClientHeight()
+    console.log(clientHeight)
+    var tdHeight = clientHeight - 248
+    console.log(tdHeight)
+    document.getElementById('needModifyTr').setAttribute("style", "height: " + tdHeight + "px;");
+    // jqu.formItem('start_time', 'form_search').datetimepicker({
+    //     format: 'yyyy-mm-dd',
+    //     autoclose: 1,
+    //     todayHighlight: 1,
+    //     todayBtn: true,
+    //     language: 'zh-CN',
+    //     minView: 2
+    // });
+    // jqu.formItem('end_time', 'form_search').datetimepicker({
+    //     format: 'yyyy-mm-dd',
+    //     autoclose: 1,
+    //     todayHighlight: 1,
+    //     todayBtn: true,
+    //     language: 'zh-CN',
+    //     minView: 2
+    // });
+};
+
+$(initPlane);
+
 var Receiver = echarts.init(document.getElementById('Receiver'));
 ReceiverOption = {
     tooltip: {
@@ -287,7 +323,7 @@ var updateSetting = function () {
     var data = jqu.formData('form_setting');
     console.log(data)
     jqu.loadJson('/setting/set', data, function (result) {
-        if (result.code!=200) {
+        if (result.code != 200) {
             alert(result.code);
             return;
         }
