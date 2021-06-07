@@ -102,10 +102,10 @@ def router_out(net1, net2):
             R_t_lock.release()
 
             now_time = time.time()
-            log = "[{}] [Router] [Flow ID: {}] [Weight: {}] [{}:{} -> {}:{}] {}".format(
+            log = "[{}] [Router] [Flow ID: {}] [Weight: {}] [{}:{} -> {}:{}] [{}] {}".format(
                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(now_time)),
                 packet.flow_id, packet.weight, packet.source_ip, packet.source_port, packet.destination_ip,
-                packet.destination_port, packet.data)
+                packet.destination_port, len(data) - 24, packet.data)
             logger.info(log)
 
 

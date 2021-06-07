@@ -197,7 +197,7 @@ setInterval(function () {
             ]
         });
     });
-    $.get('/data/receiver_demo', function (res) {
+    $.get('/data/receiver_data', function (res) {
         Receiver.hideLoading();
         console.log("Receiver: ", res);
         Receiver.setOption({

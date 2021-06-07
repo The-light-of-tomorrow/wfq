@@ -1,6 +1,7 @@
 import binascii
 import requests
 import json
+from datetime import datetime
 
 control_plane_ip = '127.0.0.1'
 
@@ -72,3 +73,28 @@ def packet_encode_exchange_source_dest(packet):
     temp = packet[8:16] + packet[:8] + packet[24:32] + packet[16:24] + packet[32:40] + packet[40:48] + packet[48:]
     packet = temp.encode()
     return packet
+
+
+# import time
+# import datetime
+#
+#
+# # 正确10位长度的时间戳可精确到秒，11-14位长度则是包含了毫秒
+# def int2datetime(intValue):
+#     if len(str(intValue)) == 10:
+#         # 精确到秒
+#         timeValue = time.localtime(intValue)
+#         tempDate = time.strftime("%Y-%m-%d %H:%M:%S", timeValue)
+#         datetimeValue = datetime.datetime.strptime(tempDate, "%Y-%m-%d %H:%M:%S")
+#     elif 10 < len(str(intValue)) and len(str(intValue)) < 15:
+#         # 精确到毫秒
+#         k = len(str(intValue)) - 10
+#         timetamp = datetime.datetime.fromtimestamp(intValue / (1 * 10 ** k))
+#         datetimeValue = timetamp.strftime("%Y-%m-%d %H:%M:%S.%f")
+#     else:
+#         return -1
+
+
+def int2datetime(value):
+    result = datetime.fromtimestamp(value / (1 * 10 ** (len(str(value)) - 10))).strftime("%Y-%m-%d %H:%M:%S.%f")
+    return result[:-3]

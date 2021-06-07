@@ -26,10 +26,10 @@ if __name__ == '__main__':
         data, _ = s.recvfrom(1400 + 24 + 8)
         packet = PacketDecode(data)
         now_time = time.time()
-        log = "[{}] [R] [Flow ID: {}] [Weight: {}] [{}:{} -> {}:{}] {}".format(
+        log = "[{}] [R] [Flow ID: {}] [Weight: {}] [{}:{} -> {}:{}] [{}] {}".format(
             time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(now_time)),
             packet.flow_id, packet.weight, packet.source_ip, packet.source_port, packet.destination_ip,
-            packet.destination_port, packet.data)
+            packet.destination_port, len(data) - 24, packet.data)
         logger.info(log)
         # 通知控制平面 Flow ID, 接收时间，包大小，packet_number
         post_log(packet.flow_id, len(data) - 24, packet.packet_number, now_time, 2)

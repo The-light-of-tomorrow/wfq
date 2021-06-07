@@ -4,7 +4,7 @@ import threading
 import logging
 from binascii import hexlify
 
-from util.tools import PacketDecode, post_log, post_dhcp
+from util.tools import PacketDecode, post_log, post_dhcp, get_setting
 
 packet_number = 0
 
@@ -23,22 +23,6 @@ def get_packet(project_header, pa_size):
     return packet, packet_number
 
 
-def send_packet(r, sender_info, s):
-    for _ in range(r):
-        packet, packet_num = get_packet(sender_info.get_project_header(), sender_info.packet_size)
-        addr = (sender_info.gateway, 2021)
-        s.sendto(packet.encode(), addr)
-        packet = PacketDecode(packet.encode())
-        now_time = time.time()
-        log = "[{}] [S] [Flow ID: {}] [Weight: {}] [{}:{} -> {}:{}] {}".format(
-            str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(now_time))),
-            packet.flow_id, packet.weight, packet.source_ip, packet.source_port, packet.destination_ip,
-            packet.destination_port, packet.data)
-        logger.info(log)
-        # 通知控制平面 Flow ID, 发送时间，包大小，packet_number
-        post_log(sender_info.flow_id, sender_info.packet_size, packet_num, time.time(), 0)
-
-
 class Sender:
     def __init__(self, w, _packet_size):
         self.address = post_dhcp('Sender')
@@ -48,6 +32,12 @@ class Sender:
         self.weight = w
         self.flow_id = self.address['address'][-1]
         self.packet_size = _packet_size
+
+    def update_weight(self, w):
+        self.weight = w
+
+    def update_packet_size(self, size):
+        self.packet_size = size
 
     def get_project_header(self):
         tr_weight = hex(self.weight)[2:].zfill(8)
@@ -79,10 +69,22 @@ class Sender:
         return project_header
 
 
-def sender_f(sc, udp_s):
+def sender_f(r, sender_info, s):
     while True:
-        send_packet(rate, sc, udp_s)
-        time.sleep(1)
+        for _ in range(r):
+            packet, packet_num = get_packet(sender_info.get_project_header(), sender_info.packet_size)
+            addr = (sender_info.gateway, 2021)
+            s.sendto(packet.encode(), addr)
+            packet = PacketDecode(packet.encode())
+            now_time = time.time()
+            log = "[{}] [S] [Flow ID: {}] [Weight: {}] [{}:{} -> {}:{}] {}".format(
+                str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(now_time))),
+                packet.flow_id, packet.weight, packet.source_ip, packet.source_port, packet.destination_ip,
+                packet.destination_port, packet.data)
+            logger.info(log)
+            # 通知控制平面 Flow ID, 发送时间，包大小，packet_number
+            post_log(sender_info.flow_id, sender_info.packet_size, packet_num, time.time(), 0)
+            time.sleep(1 / int(r))
 
 
 def receiver_f(sc, udp_s):
@@ -90,10 +92,10 @@ def receiver_f(sc, udp_s):
         data, _ = udp_s.recvfrom(1400 + 24 + 8)
         packet = PacketDecode(data)
         now_time = time.time()
-        log = "[{}] [R] [Flow ID: {}] [Weight: {}] [{}:{} -> {}:{}] {}".format(
+        log = "[{}] [R] [Flow ID: {}] [Weight: {}] [{}:{} -> {}:{}] [{}] {}".format(
             str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(now_time))),
             packet.flow_id, packet.weight, packet.source_ip, packet.source_port, packet.destination_ip,
-            packet.destination_port, packet.data)
+            packet.destination_port, len(data) - 24, packet.data)
         logger.info(log)
         # 通知控制平面 Flow ID, 接收时间，包大小，packet_number
         post_log(packet.flow_id, sc.packet_size, packet.packet_number, now_time, 1)
@@ -106,12 +108,25 @@ if __name__ == '__main__':
     rate = 10
     # 包大小
     packet_size = 512
+    #
     sender = Sender(weight, packet_size)
+    setting = get_setting()
+    if sender.source_ip == '0.0.0.0':
+        logger.error("Address Pool -1.")
+        import sys
+
+        sys.exit()
+    weight = setting['Sender'][sender.source_ip][0]
+    packet_size = setting['Sender'][sender.source_ip][1]
+    rate = setting['Sender'][sender.source_ip][2]
+    weight, packet_size, rate = int(weight), int(packet_size), int(rate)
+    sender.update_weight(weight)
+    sender.update_packet_size(packet_size)
 
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_socket.bind((sender.source_ip, 2021))
     # 双线程启动与同步
-    thread_sender = threading.Thread(target=sender_f, args=(sender, udp_socket,))
+    thread_sender = threading.Thread(target=sender_f, args=(rate, sender, udp_socket,))
     thread_receiver = threading.Thread(target=receiver_f, args=(sender, udp_socket,))
     thread_sender.start()
     thread_receiver.start()
