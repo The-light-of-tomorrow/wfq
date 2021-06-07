@@ -199,7 +199,7 @@ def log():
 
 @app.route('/log/router', methods=['POST'])
 def router():
-    # 统计Router的t,R(t),Acitve Queue Number
+    # 统计Router的t,R(t), Acitve Queue Number
     time_t = request.form.get('time_t')
     round_number_t = request.form.get('round_number_t')
     active_queue_number = request.form.get('active_queue_number')

@@ -4,7 +4,7 @@ import threading
 import logging
 from binascii import hexlify
 
-from util.packet import PacketDecode, post_log, post_dhcp
+from util.tools import PacketDecode, post_log, post_dhcp
 
 packet_number = 0
 
