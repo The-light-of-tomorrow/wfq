@@ -7,6 +7,7 @@ from util.packet import PacketDecode, get_setting, router_post
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 lock = threading.Lock()
 lock1 = threading.Lock()
 lock2 = threading.Lock()
@@ -88,9 +89,9 @@ def router_out(net1, net2):
             token_lock.release()
             # 根据 destination ip 实现路由下一条匹配算法，最长前缀匹配原则
             if packet.destination_ip[:8] == '172.16.2':
-                net_hop = net1
-            elif packet.destination_ip[:8] == '172.16.1':
                 net_hop = net2
+            elif packet.destination_ip[:8] == '172.16.1':
+                net_hop = net1
             else:
                 net_hop = -1
             net_hop.sendto(data, (packet.destination_ip, 2021))
@@ -224,11 +225,13 @@ def router_in_with_wfq(s):
 if __name__ == '__main__':
     s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s1.bind(("172.16.2.254", 2021))
-    s2.bind(("172.16.1.254", 2021))
+    s1.bind(("172.16.1.254", 2021))
+    s2.bind(("172.16.2.254", 2021))
+    logger.info("forwarding_algorithm: {}".format(setting['forwarding_algorithm']))
     if setting['forwarding_algorithm'] == 'FIFO':
         t = [threading.Thread(target=router_in, args=(s1,)),
              threading.Thread(target=router_in, args=(s2,)),
+             threading.Thread(target=token_bucket),
              threading.Thread(target=router_out, args=(s1, s2,))]
         for i in t:
             i.start()

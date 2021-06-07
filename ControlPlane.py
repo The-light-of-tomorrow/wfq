@@ -18,7 +18,7 @@ app = Flask(__name__,
             static_folder=dir_static,
             static_url_path='')
 
-sender_address_pool = ['172.16.1.1', '172.16.1.2', '172.16.1.3']
+sender_address_pool = ['172.16.1.3', '172.16.1.2', '172.16.1.1']
 sender_gateway = '172.16.1.254'
 receiver_address_pool = ["172.16.2.1"]
 receiver_gateway = '172.16.2.254'
@@ -38,7 +38,7 @@ class Setting:
         self.forwarding_algorithm = 'WFQ'  # FIFO WFQ
         self.RouteRate = '20Mbps'
         self.Receiver = '172.16.2.1'
-        self.Sender = {'172.16.1.1': [1, 512], '172.16.1.2': [1, 1024], '172.16.1.3': [1, 1024]}
+        self.Sender = {'172.16.1.1': [1, 1024], '172.16.1.2': [1, 512], '172.16.1.3': [2, 1024]}
 
 
 user_setting = Setting()
