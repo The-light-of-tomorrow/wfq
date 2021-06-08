@@ -24,7 +24,7 @@ q2_w = int(setting['Sender']['172.16.1.2'][0])
 q3_w = int(setting['Sender']['172.16.1.3'][0])
 
 # 带宽20Mbps，令牌桶最大20480
-max_token = int(setting.RouterRate) * 1024
+max_token = int(setting['RouterRate']) * 1024
 token = max_token
 token_lock = threading.Lock()
 # Round Number 在 t 时刻的数值

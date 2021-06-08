@@ -332,3 +332,42 @@ var updateSetting = function () {
 
     });
 };
+
+var senderStart = function () {
+    console.log('Sender Start Running!')
+    jqu.loadJson('/run', {'role': 'Sender'}, function (result) {
+        if (result.code != 200) {
+            alert(result.code);
+            return;
+        }
+        alert('Sender Start Running! 0s 1 2s 2 4s 3');
+        document.getElementById('SenderRun').setAttribute("class", "btn btn-success disabled");
+        document.getElementById('SenderRun').setAttribute("onclick", "");
+    });
+};
+
+var routerStart = function () {
+    console.log('Router Start Running!')
+    jqu.loadJson('/run', {'role': 'Router'}, function (result) {
+        if (result.code != 200) {
+            alert(result.code);
+            return;
+        }
+        alert('Router Start Running!');
+        document.getElementById('RouterRun').setAttribute("class", "btn btn-success disabled");
+        document.getElementById('RouterRun').setAttribute("onclick", "");
+    });
+};
+
+var receiverStart = function () {
+    console.log('Receiver Start Running!')
+    jqu.loadJson('/run', {'role': 'Receiver'}, function (result) {
+        if (result.code != 200) {
+            alert(result.code);
+            return;
+        }
+        alert('Receiver Start Running!');
+        document.getElementById('ReceiverRun').setAttribute("class", "btn btn-success disabled");
+        document.getElementById('ReceiverRun').setAttribute("onclick", "");
+    });
+};

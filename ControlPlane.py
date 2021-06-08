@@ -4,7 +4,8 @@ import time
 
 from flask import Flask, request, render_template
 import os
-
+import subprocess
+import sys
 from util.tools import int2datetime
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -150,6 +151,24 @@ def dhcp():
         prefix = receiver_prefix
         gateway = receiver_gateway
     result = {'address': address, 'prefix': prefix, 'gateway': gateway}
+    return json.dumps(result, ensure_ascii=False)
+
+
+@app.route('/run', methods=['POST'])
+def role_run():
+    role = request.form.get('role')
+    if role == 'Sender':
+        print('S')
+        result = subprocess.run(
+            [sys.executable, "test.py"], capture_output=True, text=True
+        )
+        print("stdout:", result.stdout)
+        print("stderr:", result.stderr)
+    elif role == 'Router':
+        print('R')
+    elif role == 'Receiver':
+        print('R')
+    result = {'code': 200}
     return json.dumps(result, ensure_ascii=False)
 
 

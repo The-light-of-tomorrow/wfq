@@ -49,16 +49,22 @@
             </tr>
             <tr style="height: 55px; text-align: center">
                 <td>
-                    <button class="btn btn-success disabled" type="button" style="margin-right: 30px;">Start</button>
+                    <button class="btn btn-success" type="button" id="SenderRun" style="margin-right: 30px;"
+                            onclick="senderStart()">Start
+                    </button>
 
                     <button class="btn btn-danger disabled" type="button">Stop</button>
                 </td>
                 <td>
-                    <button class="btn btn-success disabled" type="button" style="margin-right: 30px;">Start</button>
+                    <button class="btn btn-success" type="button" id="RouterRun" style="margin-right: 30px;"
+                            onclick="routerStart()">Start
+                    </button>
                     <button class="btn btn-danger disabled" type="button">Stop</button>
                 </td>
                 <td>
-                    <button class="btn btn-success disabled" type="button" style="margin-right: 30px;">Start</button>
+                    <button class="btn btn-success" type="button" id="ReceiverRun" style="margin-right: 30px;"
+                            onclick="receiverStart()">Start
+                    </button>
                     <button class="btn btn-danger disabled" type="button">Stop</button>
                 </td>
             </tr>
@@ -278,11 +284,11 @@
                                     </span>
                                     <select name="forward_algorithm" class="form-control">
                                         {% if response.forward_algorithm=='WFQ' %}
-                                            <option value="WFQ" selected="selected">WFQ</option>
-                                            <option value="FIFO">FIFO</option>
+                                        <option value="WFQ" selected="selected">WFQ</option>
+                                        <option value="FIFO">FIFO</option>
                                         {% elif response.forward_algorithm=='FIFO' %}
-                                            <option value="WFQ">WFQ</option>
-                                            <option value="FIFO" selected="selected">FIFO</option>
+                                        <option value="WFQ">WFQ</option>
+                                        <option value="FIFO" selected="selected">FIFO</option>
                                         {% endif %}
                                     </select>
                                 </div>
@@ -294,10 +300,18 @@
                                         转发速率
                                     </span>
                                     <select name="forward_rate" class="form-control">
-                                        <option value="20" {% if response.forward_rate=='20' %}selected="selected"{% endif %}>20 Mbps</option>
-                                        <option value="50" {% if response.forward_rate=='50' %}selected="selected"{% endif %}>50 Mbps</option>
-                                        <option value="100" {% if response.forward_rate=='100' %}selected="selected"{% endif %}>100 Mbps</option>
-                                        <option value="200" {% if response.forward_rate=='200' %}selected="selected"{% endif %}>200 Mbps</option>
+                                        <option value="20" {% if response.forward_rate=='20' %}selected="selected" {%
+                                                endif %}>20 Mbps
+                                        </option>
+                                        <option value="50" {% if response.forward_rate=='50' %}selected="selected" {%
+                                                endif %}>50 Mbps
+                                        </option>
+                                        <option value="100" {% if response.forward_rate=='100' %}selected="selected" {%
+                                                endif %}>100 Mbps
+                                        </option>
+                                        <option value="200" {% if response.forward_rate=='200' %}selected="selected" {%
+                                                endif %}>200 Mbps
+                                        </option>
                                     </select>
                                 </div>
                             </td>
