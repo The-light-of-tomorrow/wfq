@@ -186,7 +186,7 @@ def setting_set():
 def setting_get():
     # 读取设置
     result = {'forwarding_algorithm': user_setting.forwarding_algorithm, 'Sender': user_setting.Sender,
-              'RouteRate': user_setting.RouterRate}
+              'RouterRate': user_setting.RouterRate}
     return json.dumps(result, ensure_ascii=False)
 
 
