@@ -372,3 +372,16 @@ var receiverStart = function () {
         document.getElementById('ReceiverRun').setAttribute("onclick", "");
     });
 };
+
+var systemReset = function () {
+    console.log('System Rest!')
+    jqu.loadJson('/reset', {}, function (result) {
+        if (result.code == 0) {
+            alert('System Reset!');
+            location.reload();
+        } else {
+            alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
+            return;
+        }
+    });
+};

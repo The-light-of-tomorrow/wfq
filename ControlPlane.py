@@ -195,7 +195,7 @@ def reset():
     # 停止应用，恢复全局变量
     if platform.system() != 'Linux':
         return -1, '仅当控制平面运行在Linux服务器上可以使用此操作！'
-    cmd = 'ps -ef | grep python3'
+    cmd = r"/usr/bin/kill -9 $(/usr/bin/ps -ef | /usr/bin/grep /usr/bin/python3 | /usr/bin/grep -E 'Router.py|Receiver.py|Sender.py' | /usr/bin/awk -F ' ' '{print $2}')"
     os.system(cmd)
     sum1 = 0
     sum2 = 0

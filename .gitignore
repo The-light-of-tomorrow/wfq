@@ -3,3 +3,5 @@ venv
 *.log
 *.pyc
 **/__pycache__/**
+nohup.out
+test.py
