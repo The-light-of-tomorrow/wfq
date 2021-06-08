@@ -332,10 +332,10 @@ var updateSetting = function () {
 };
 
 var senderStart = function () {
-    alert('Sender Start Running!');
     jqu.loadJson('/run', {'role': 'Sender'}, function (result) {
         if (result.code == 0) {
             console.log('Sender Start Running!')
+            location.reload()
         } else {
             alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
             return;
