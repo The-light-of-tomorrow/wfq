@@ -332,10 +332,10 @@ var updateSetting = function () {
 };
 
 var senderStart = function () {
-    console.log('Sender Start Running!')
+    alert('Sender Start Running!');
     jqu.loadJson('/run', {'role': 'Sender'}, function (result) {
         if (result.code == 0) {
-            alert('Sender Start Running!');
+            console.log('Sender Start Running!')
         } else {
             alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
             return;
@@ -378,7 +378,6 @@ var systemReset = function () {
     jqu.loadJson('/reset', {}, function (result) {
         if (result.code == 0) {
             alert('System Reset!');
-            location.reload();
         } else {
             alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
             return;

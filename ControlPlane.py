@@ -189,14 +189,19 @@ def run_receiver():
     return 0, 'OK'
 
 
+def stop_process():
+    cmd = r"/usr/bin/kill -9 $(/usr/bin/ps -ef | /usr/bin/grep /usr/bin/python3 | /usr/bin/grep -E 'Router.py|Receiver.py|Sender.py' | /usr/bin/awk -F ' ' '{print $2}')"
+    os.system(cmd)
+
+
 @app.route('/reset', methods=['POST'])
-def reset():
+def system_reset():
     global sum1, sum2, sum3, user_setting, sender_data, receiver_data, sender_data_result, router_data, sender_address_pool, receiver_address_pool
     # 停止应用，恢复全局变量
     if platform.system() != 'Linux':
-        return -1, '仅当控制平面运行在Linux服务器上可以使用此操作！'
-    cmd = r"/usr/bin/kill -9 $(/usr/bin/ps -ef | /usr/bin/grep /usr/bin/python3 | /usr/bin/grep -E 'Router.py|Receiver.py|Sender.py' | /usr/bin/awk -F ' ' '{print $2}')"
-    os.system(cmd)
+        result = {'code': -1, 'msg': '仅当控制平面运行在Linux服务器上可以使用此操作！'}
+        return json.dumps(result, ensure_ascii=False)
+    stop_process()
     sum1 = 0
     sum2 = 0
     sum3 = 0
@@ -207,7 +212,8 @@ def reset():
     router_data = []
     sender_address_pool = ['172.16.1.3', '172.16.1.2', '172.16.1.1']
     receiver_address_pool = ["172.16.2.1"]
-    return 0, 'OK'
+    result = {'code': 0, 'msg': 'OK'}
+    return json.dumps(result, ensure_ascii=False)
 
 
 @app.route('/run', methods=['POST'])
