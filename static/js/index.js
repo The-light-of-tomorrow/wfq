@@ -335,7 +335,6 @@ var senderStart = function () {
     jqu.loadJson('/run', {'role': 'Sender'}, function (result) {
         if (result.code == 0) {
             console.log('Sender Start Running!')
-            location.reload()
         } else {
             alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
             return;
@@ -378,6 +377,7 @@ var systemReset = function () {
     jqu.loadJson('/reset', {}, function (result) {
         if (result.code == 0) {
             alert('System Reset!');
+            location.reload()
         } else {
             alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
             return;
