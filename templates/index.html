@@ -271,20 +271,35 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="7" style="text-align: center">
-                                <h4>
-                                    <label>转发算法：</label>
-                                    <select name="forward_algorithm">
-                                        {% if forward_algorithm==WFQ %}
-                                        <option value="WFQ" selected="selected">WFQ</option>
-                                        <option value="FIFO">FIFO</option>
-                                        {% elif forward_algorithm==FIFO %}
-                                        <option value="WFQ">WFQ</option>
-                                        <option value="FIFO" selected="selected">FIFO</option>
+                            <td colspan="3" style="text-align: center">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        转发算法
+                                    </span>
+                                    <select name="forward_algorithm" class="form-control">
+                                        {% if response.forward_algorithm=='WFQ' %}
+                                            <option value="WFQ" selected="selected">WFQ</option>
+                                            <option value="FIFO">FIFO</option>
+                                        {% elif response.forward_algorithm=='FIFO' %}
+                                            <option value="WFQ">WFQ</option>
+                                            <option value="FIFO" selected="selected">FIFO</option>
                                         {% endif %}
                                     </select>
-                                </h4>
-
+                                </div>
+                            </td>
+                            <td></td>
+                            <td colspan="3" style="text-align: center">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        转发速率
+                                    </span>
+                                    <select name="forward_rate" class="form-control">
+                                        <option value="20" {% if response.forward_rate=='20' %}selected="selected"{% endif %}>20 Mbps</option>
+                                        <option value="50" {% if response.forward_rate=='50' %}selected="selected"{% endif %}>50 Mbps</option>
+                                        <option value="100" {% if response.forward_rate=='100' %}selected="selected"{% endif %}>100 Mbps</option>
+                                        <option value="200" {% if response.forward_rate=='200' %}selected="selected"{% endif %}>200 Mbps</option>
+                                    </select>
+                                </div>
                             </td>
                         </tr>
                     </table>

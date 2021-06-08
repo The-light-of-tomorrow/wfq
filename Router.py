@@ -13,10 +13,10 @@ lock1 = threading.Lock()
 lock2 = threading.Lock()
 lock3 = threading.Lock()
 
-q = queue.Queue(3000)
-q1 = queue.Queue(1000)
-q2 = queue.Queue(1000)
-q3 = queue.Queue(1000)
+q = queue.Queue(30000)
+q1 = queue.Queue(10000)
+q2 = queue.Queue(10000)
+q3 = queue.Queue(10000)
 
 setting = get_setting()
 q1_w = int(setting['Sender']['172.16.1.1'][0])
@@ -24,7 +24,8 @@ q2_w = int(setting['Sender']['172.16.1.2'][0])
 q3_w = int(setting['Sender']['172.16.1.3'][0])
 
 # 带宽20Mbps，令牌桶最大20480
-token = 20480
+max_token = int(setting.RouterRate)
+token = max_token
 token_lock = threading.Lock()
 # Round Number 在 t 时刻的数值
 R_t = 0
@@ -50,9 +51,9 @@ def token_bucket():
     global token_lock
     while True:
         token_lock.acquire()
-        token += 2048
-        if token > 20480:
-            token = 20480
+        token += max_token/10
+        if token > max_token:
+            token = max_token
         token_lock.release()
         # sleep 100ms
         time.sleep(0.1)

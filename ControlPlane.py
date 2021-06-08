@@ -36,23 +36,13 @@ router_data = []
 class Setting:
     def __init__(self):
         self.forwarding_algorithm = 'WFQ'  # FIFO WFQ
-        self.RouteRate = '20Mbps'
+        self.RouterRate = '20'
         self.Receiver = '172.16.2.1'
         # weight packet_size sender_rate
         self.Sender = {'172.16.1.1': [1, 1024, 10], '172.16.1.2': [1, 512, 10], '172.16.1.3': [2, 1024, 10]}
 
 
 user_setting = Setting()
-
-
-@app.route('/data/sender_demo')
-def sender_demo():
-    return {
-        "time_line": ['0s', '2s', '4s', '6s', '8s', '10s', '12s'],
-        "flow_id_1": [0, 1, 4, 0, 230, 210],
-        "flow_id_2": [0, 2, 5, 0, 0, 330, 310],
-        "flow_id_3": [0, 3, 6, 154, 190, 330, 410]
-    }
 
 
 @app.route('/data/sender_data_result')
@@ -139,8 +129,8 @@ def data_router_data():
 
 @app.route('/')
 def index():
-    print(user_setting.forwarding_algorithm)
-    return render_template("index.html", forwarding_algorithm=user_setting.forwarding_algorithm)
+    response = {'forward_rate': user_setting.RouterRate, 'forward_algorithm': user_setting.forwarding_algorithm}
+    return render_template("index.html", response=response)
 
 
 @app.route('/dhcp', methods=['POST'])
@@ -166,7 +156,9 @@ def dhcp():
 @app.route('/setting/set', methods=['POST'])
 def setting_set():
     forward_algorithm = request.form.get('forward_algorithm')
+    forward_rate = request.form.get('forward_rate')
     user_setting.forwarding_algorithm = forward_algorithm
+    user_setting.RouterRate = forward_rate
     result = {'code': 200}
     return json.dumps(result, ensure_ascii=False)
 
@@ -174,7 +166,8 @@ def setting_set():
 @app.route('/setting/get', methods=['POST'])
 def setting_get():
     # 读取设置
-    result = {'forwarding_algorithm': user_setting.forwarding_algorithm, 'Sender': user_setting.Sender}
+    result = {'forwarding_algorithm': user_setting.forwarding_algorithm, 'Sender': user_setting.Sender,
+              'RouteRate': user_setting.RouterRate}
     return json.dumps(result, ensure_ascii=False)
 
 
