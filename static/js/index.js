@@ -332,15 +332,18 @@ var updateSetting = function () {
 };
 
 var senderStart = function () {
+    document.getElementById('SenderRun').setAttribute("class", "btn btn-success disabled");
+    document.getElementById('SenderRun').setAttribute("onclick", "");
     jqu.loadJson('/run', {'role': 'Sender'}, function (result) {
         if (result.code == 0) {
             console.log('Sender Start Running!')
         } else {
+            document.getElementById('SenderRun').setAttribute("class", "btn btn-success");
+            document.getElementById('SenderRun').setAttribute("onclick", "senderStart()");
             alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
             return;
         }
-        document.getElementById('SenderRun').setAttribute("class", "btn btn-success disabled");
-        document.getElementById('SenderRun').setAttribute("onclick", "");
+
     });
 };
 
