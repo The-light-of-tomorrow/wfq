@@ -36,7 +36,7 @@ router_data = []
 class Setting:
     def __init__(self):
         self.forwarding_algorithm = 'WFQ'  # FIFO WFQ
-        self.RouterRate = '20'
+        self.RouterRate = '100'
         self.Receiver = '172.16.2.1'
         # weight packet_size sender_rate
         self.Sender = {'172.16.1.1': [1, 1024, 10], '172.16.1.2': [1, 512, 10], '172.16.1.3': [2, 1024, 10]}
