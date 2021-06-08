@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 from util.tools import int2datetime
+import platform
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -21,18 +22,6 @@ app = Flask(__name__,
             static_folder=dir_static,
             static_url_path='')
 
-sender_address_pool = ['172.16.1.3', '172.16.1.2', '172.16.1.1']
-sender_gateway = '172.16.1.254'
-receiver_address_pool = ["172.16.2.1"]
-receiver_gateway = '172.16.2.254'
-sender_prefix = 24
-receiver_prefix = 24
-
-sender_data = {'1': [], '2': [], '3': []}
-receiver_data = {'1': [], '2': [], '3': []}
-sender_data_result = []
-router_data = []
-
 
 class Setting:
     def __init__(self):
@@ -41,9 +30,27 @@ class Setting:
         self.Receiver = '172.16.2.1'
         # weight packet_size sender_rate
         self.Sender = {'172.16.1.1': [1, 1024, 10], '172.16.1.2': [1, 512, 10], '172.16.1.3': [2, 1024, 10]}
+        self.status_sender = 0
+        self.status_router = 0
+        self.status_receiver = 0
 
 
+# 返回时间、每个 Flow ID 接收的数据包总大小
+sum1 = 0
+sum2 = 0
+sum3 = 0
 user_setting = Setting()
+sender_data = {'1': [], '2': [], '3': []}
+receiver_data = {'1': [], '2': [], '3': []}
+sender_data_result = []
+router_data = []
+sender_address_pool = ['172.16.1.3', '172.16.1.2', '172.16.1.1']
+receiver_address_pool = ["172.16.2.1"]
+
+sender_gateway = '172.16.1.254'
+receiver_gateway = '172.16.2.254'
+sender_prefix = 24
+receiver_prefix = 24
 
 
 @app.route('/data/sender_data_result')
@@ -74,12 +81,6 @@ def data_sender_data_result():
               'flow_id_2': ['0'] * (len(flow_id_1) - len(flow_id_2)) + flow_id_2,
               'flow_id_3': ['0'] * (len(flow_id_1) - len(flow_id_3)) + flow_id_3}
     return result
-
-
-# 返回时间、每个 Flow ID 接收的数据包总大小
-sum1 = 0
-sum2 = 0
-sum3 = 0
 
 
 @app.route('/data/receiver_data')
@@ -154,21 +155,71 @@ def dhcp():
     return json.dumps(result, ensure_ascii=False)
 
 
+def run_sender():
+    if platform.system() != 'Linux':
+        return -1, '仅当控制平面运行在Linux服务器上可以使用此操作！'
+    if user_setting.status_router == 0:
+        return -2, '请先启动 Router !'
+    if user_setting.status_receiver == 0:
+        return -3, '请先启动 Receiver !'
+    user_setting.status_sender = 1
+    os.system('nohup /usr/bin/python3 Sender.py &')
+    time.sleep(2)
+    os.system('nohup /usr/bin/python3 Sender.py &')
+    time.sleep(2)
+    os.system('nohup /usr/bin/python3 Sender.py &')
+    return 0, 'OK'
+
+
+def run_router():
+    if platform.system() != 'Linux':
+        return -1, '仅当控制平面运行在Linux服务器上可以使用此操作！'
+    user_setting.status_router = 1
+    os.system('nohup /usr/bin/python3 Router.py &')
+    return 0, 'OK'
+
+
+def run_receiver():
+    if platform.system() != 'Linux':
+        return -1, '仅当控制平面运行在Linux服务器上可以使用此操作！'
+    if user_setting.status_router == 0:
+        return -2, '请先启动 Router'
+    user_setting.status_receiver = 1
+    os.system('nohup /usr/bin/python3 Receiver.py &')
+    return 0, 'OK'
+
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    global sum1, sum2, sum3, user_setting, sender_data, receiver_data, sender_data_result, router_data, sender_address_pool, receiver_address_pool
+    # 停止应用，恢复全局变量
+    if platform.system() != 'Linux':
+        return -1, '仅当控制平面运行在Linux服务器上可以使用此操作！'
+    cmd = 'ps -ef | grep python3'
+    os.system(cmd)
+    sum1 = 0
+    sum2 = 0
+    sum3 = 0
+    user_setting = Setting()
+    sender_data = {'1': [], '2': [], '3': []}
+    receiver_data = {'1': [], '2': [], '3': []}
+    sender_data_result = []
+    router_data = []
+    sender_address_pool = ['172.16.1.3', '172.16.1.2', '172.16.1.1']
+    receiver_address_pool = ["172.16.2.1"]
+    return 0, 'OK'
+
+
 @app.route('/run', methods=['POST'])
 def role_run():
     role = request.form.get('role')
     if role == 'Sender':
-        print('S')
-        result = subprocess.run(
-            [sys.executable, "test.py"], capture_output=True, text=True
-        )
-        print("stdout:", result.stdout)
-        print("stderr:", result.stderr)
+        code, msg = run_sender()
     elif role == 'Router':
-        print('R')
+        code, msg = run_router()
     elif role == 'Receiver':
-        print('R')
-    result = {'code': 200}
+        code, msg = run_receiver()
+    result = {'code': code, 'msg': msg}
     return json.dumps(result, ensure_ascii=False)
 
 
@@ -185,8 +236,12 @@ def setting_set():
 @app.route('/setting/get', methods=['POST'])
 def setting_get():
     # 读取设置
-    result = {'forwarding_algorithm': user_setting.forwarding_algorithm, 'Sender': user_setting.Sender,
-              'RouterRate': user_setting.RouterRate}
+    result = {'forwarding_algorithm': user_setting.forwarding_algorithm,
+              'Sender': user_setting.Sender,
+              'RouterRate': user_setting.RouterRate,
+              'status_sender': user_setting.status_sender,
+              'status_router': user_setting.status_router,
+              'status_receiver': user_setting.status_receiver}
     return json.dumps(result, ensure_ascii=False)
 
 

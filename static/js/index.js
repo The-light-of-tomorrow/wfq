@@ -14,22 +14,20 @@ var initPlane = function () {
     var tdHeight = clientHeight - 248
     console.log(tdHeight)
     document.getElementById('needModifyTr').setAttribute("style", "height: " + tdHeight + "px;");
-    // jqu.formItem('start_time', 'form_search').datetimepicker({
-    //     format: 'yyyy-mm-dd',
-    //     autoclose: 1,
-    //     todayHighlight: 1,
-    //     todayBtn: true,
-    //     language: 'zh-CN',
-    //     minView: 2
-    // });
-    // jqu.formItem('end_time', 'form_search').datetimepicker({
-    //     format: 'yyyy-mm-dd',
-    //     autoclose: 1,
-    //     todayHighlight: 1,
-    //     todayBtn: true,
-    //     language: 'zh-CN',
-    //     minView: 2
-    // });
+    jqu.loadJson('/setting/get', {}, function (result) {
+        if (result.status_sender == 1) {
+            document.getElementById('SenderRun').setAttribute("class", "btn btn-success disabled");
+            document.getElementById('SenderRun').setAttribute("onclick", "");
+        }
+        if (result.status_router == 1) {
+            document.getElementById('RouterRun').setAttribute("class", "btn btn-success disabled");
+            document.getElementById('RouterRun').setAttribute("onclick", "");
+        }
+        if (result.status_receiver == 1) {
+            document.getElementById('ReceiverRun').setAttribute("class", "btn btn-success disabled");
+            document.getElementById('ReceiverRun').setAttribute("onclick", "");
+        }
+    });
 };
 
 $(initPlane);
@@ -336,11 +334,12 @@ var updateSetting = function () {
 var senderStart = function () {
     console.log('Sender Start Running!')
     jqu.loadJson('/run', {'role': 'Sender'}, function (result) {
-        if (result.code != 200) {
-            alert(result.code);
+        if (result.code == 0) {
+            alert('Sender Start Running!');
+        } else {
+            alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
             return;
         }
-        alert('Sender Start Running! 0s 1 2s 2 4s 3');
         document.getElementById('SenderRun').setAttribute("class", "btn btn-success disabled");
         document.getElementById('SenderRun').setAttribute("onclick", "");
     });
@@ -349,11 +348,12 @@ var senderStart = function () {
 var routerStart = function () {
     console.log('Router Start Running!')
     jqu.loadJson('/run', {'role': 'Router'}, function (result) {
-        if (result.code != 200) {
-            alert(result.code);
+        if (result.code == 0) {
+            alert('Router Start Running!');
+        } else {
+            alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
             return;
         }
-        alert('Router Start Running!');
         document.getElementById('RouterRun').setAttribute("class", "btn btn-success disabled");
         document.getElementById('RouterRun').setAttribute("onclick", "");
     });
@@ -362,11 +362,12 @@ var routerStart = function () {
 var receiverStart = function () {
     console.log('Receiver Start Running!')
     jqu.loadJson('/run', {'role': 'Receiver'}, function (result) {
-        if (result.code != 200) {
-            alert(result.code);
+        if (result.code == 0) {
+            alert('Receiver Start Running!');
+        } else {
+            alert('Error Code: ' + result.code + ', Msg: ' + result.msg);
             return;
         }
-        alert('Receiver Start Running!');
         document.getElementById('ReceiverRun').setAttribute("class", "btn btn-success disabled");
         document.getElementById('ReceiverRun').setAttribute("onclick", "");
     });
